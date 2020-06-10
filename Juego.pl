@@ -1,34 +1,23 @@
 :- use_rendering(table).
 
-obtenerT(r1,1).
-obtenerT(r2,2).
-obtenerT(r3,3).
+obtenerT(X,1):- member(X,[v1,a1,r1]).
+obtenerT(X,2):- member(X,[v2,a2,r2]).
+obtenerT(X,3):- member(X,[v3,a3,r3]).
 
-obtenerT(a1,1).
-obtenerT(a2,2).
-obtenerT(a3,3).
 
-obtenerT(v1,1).
-obtenerT(v2,2).
-obtenerT(v3,3).
-
-/*cambiar obtenerT por la idea del member */
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+obtenerFila(N,[L1,_L2,_L3,_L4,_L5],ListaD):-
   N is 1,
   ListaD = L1.
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
-  N is 1,
-  ListaD = L1.
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+obtenerFila(N,[_L1,L2,_L3,_L4,_L5],ListaD):-
   N is 2,
   ListaD = L2.
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+obtenerFila(N,[_L1,_L2,L3,_L4,_L5],ListaD):-
   N is 3,
   ListaD = L3.
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+obtenerFila(N,[_L1,_L2,_L3,L4,_L5],ListaD):-
   N is 4,
   ListaD = L4.
-obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+obtenerFila(N,[_L1,_L2,_L3,_L4,L5],ListaD):-
   N is 5,
   ListaD = L5.
 
@@ -42,15 +31,15 @@ generarTablero(Tablero):-
 
 generarFila(L):-
   random(1,4,C1),
-  agregamos(C1,[],L1),
+  add(C1,[],L1),
   random(1,4,C2),
-  agregamos(C2,L1,L2),
+  add(C2,L1,L2),
   random(1,4,C3),
-  agregamos(C3,L2,L3),
+  add(C3,L2,L3),
   random(1,4,C4),
-  agregamos(C4,L3,L4),
+  add(C4,L3,L4),
   random(1,4,C5),
-  agregamos(C5,L4,L5),
+  add(C5,L4,L5),
   L = L5.
 
 /*corrimineto
@@ -58,23 +47,23 @@ colapso
 acom*/
 
 
-agregamos(Elem , Lista , ListaN):-
+add(Elem , Lista , ListaN):-
   Elem is 1,
   addLast(a1,Lista,ListaN).
-agregamos(Elem , Lista , ListaN):-
+add(Elem , Lista , ListaN):-
     Elem is 2,
     addLast(r1,Lista,ListaN).
-agregamos(Elem , Lista , ListaN):-
+add(Elem , Lista , ListaN):-
   Elem is 3,
   addLast(v1,Lista,ListaN).
 
 
 
-desplazar(+Dir, +Num, +Cant, +Tablero, -EvolTablero):-
+/*desplazar(+Dir, +Num, +Cant, +Tablero, -EvolTablero):-
   (Dir is   der ; Dir is  izq),
-  rotarHorizontal(Dir,)
+  rotarHorizontal(Dir, )*/
 
-rotarHorizontal(Sentido,0,Lista,ListaN).
+/*rotarHorizontal(Sentido,0,Lista,ListaN).
 
 rotarHorizontal(Sentido,Cant,Lista,ListaN):-
   Sentido is der,
@@ -84,7 +73,7 @@ rotarHorizontal(Sentido,Cant,Lista,ListaN):-
 rotarHorizontal(Sentido,Cant,Lista,ListaN):-
   Sentido is izq,
   shift_izquierda(Lista,LN),
-  rotarHorizontal(Sentido,Cant-1,LN,ListaN).
+  rotarHorizontal(Sentido,Cant-1,LN,ListaN).*/
 
 
 /*PREDICADOS AUXILIARES REUTILIZADOS DE LOS PRACTICOS*/
