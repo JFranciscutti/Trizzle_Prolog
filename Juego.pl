@@ -12,6 +12,26 @@ obtenerT(v1,1).
 obtenerT(v2,2).
 obtenerT(v3,3).
 
+/*cambiar obtenerT por la idea del member */
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 1,
+  ListaD = L1.
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 1,
+  ListaD = L1.
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 2,
+  ListaD = L2.
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 3,
+  ListaD = L3.
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 4,
+  ListaD = L4.
+obtenerFila(N,[L1,L2,L3,L4,L5],ListaD):-
+  N is 5,
+  ListaD = L5.
+
 generarTablero(Tablero):-
    generarFila(F1),
    generarFila(F2),
@@ -50,7 +70,24 @@ agregamos(Elem , Lista , ListaN):-
 
 
 
+desplazar(+Dir, +Num, +Cant, +Tablero, -EvolTablero):-
+  (Dir is   der ; Dir is  izq),
+  rotarHorizontal(Dir,)
 
+rotarHorizontal(Sentido,0,Lista,ListaN).
+
+rotarHorizontal(Sentido,Cant,Lista,ListaN):-
+  Sentido is der,
+  shift_derecha(Lista,LN),
+  rotarHorizontal(Sentido,Cant-1,LN,ListaN).
+
+rotarHorizontal(Sentido,Cant,Lista,ListaN):-
+  Sentido is izq,
+  shift_izquierda(Lista,LN),
+  rotarHorizontal(Sentido,Cant-1,LN,ListaN).
+
+
+/*PREDICADOS AUXILIARES REUTILIZADOS DE LOS PRACTICOS*/
   addLast(X,[],[X]).
   addLast(X,[H|T],R):- addLast(X,T,Z),R=[H|Z].
 
