@@ -80,7 +80,9 @@ rotarHorizontal(Sentido,Cant,Lista,ListaN):-
   addLast(X,[],[X]).
   addLast(X,[H|T],R):- addLast(X,T,Z),R=[H|Z].
 
-  shift_derecha(L,X):- ultimo(L,U),borrar(U,L,X),X=[U|L].
+  addFirst(X, L, [X | L]).
+
+  shift_derecha(L,R):- ultimo(L,U),borrar(U,L,X),addFirst(U,X,R),!.
 
   shift_izquierda([H|T],R):- borrar(H,[H|T],X), addLast(H,X,R).
 
@@ -111,8 +113,6 @@ shiftAux(Board, Columna, 4, E, NBoard):-
 
 */
 
-/*Agregar metodo para reemplazar una columna entera por una lista dada
-insertar_columna(Nro_de_Columna,Lista,Tablero?)*/
 
 /*cuando colapsan, agregar x en lugares vacios y luego
 reemplazarlos por random */
