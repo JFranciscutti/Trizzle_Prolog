@@ -21,7 +21,7 @@ obtenerFila(N,[_L1,_L2,_L3,_L4,L5],ListaD):-
   N is 5,
   ListaD = L5.
 
-
+//los _L1.._L5 tiran mas singleton que la mierda, no se que onda
 setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[L,_L2,_L3,_L4,_L5]):-
     N is 1.
 setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,L,_L3,_L4,_L5]):-
