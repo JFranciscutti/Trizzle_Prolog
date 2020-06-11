@@ -71,25 +71,25 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   C is Cant mod 5, %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
-  rotarHorizontal(Dir,C,Lista,ListaN),
+  rotarFila(Dir,C,Lista,ListaN),
   setFila(Num,ListaN,Tablero,EvolTablero).%EvolTablero es el tablero con el desplazamiento y nada mas (POR AHORA)
 
 
 
 
-rotarHorizontal(_Sentido,0,Lista,Lista):-!.
+rotarFila(_Sentido,0,Lista,Lista):-!.
 
-rotarHorizontal(Sentido,Cant,Lista,ListaN):-
+rotarFila(Sentido,Cant,Lista,ListaN):-
   Sentido = 'der',
   shift_derecha(Lista,LN),
   C is Cant - 1,
-  rotarHorizontal(Sentido,C,LN,ListaN).
+  rotarFila(Sentido,C,LN,ListaN).
 
-rotarHorizontal(Sentido,Cant,Lista,ListaN):-
+rotarFila(Sentido,Cant,Lista,ListaN):-
   Sentido = 'izq',
   shift_izquierda(Lista,LN),
   C is Cant - 1,
-  rotarHorizontal(Sentido,C,LN,ListaN).
+  rotarFila(Sentido,C,LN,ListaN).
 
 
 /*PREDICADOS AUXILIARES REUTILIZADOS DE LOS PRACTICOS*/
