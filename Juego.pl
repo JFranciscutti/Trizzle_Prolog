@@ -150,9 +150,13 @@ rotar(Sentido,Cant,Lista,ListaN):-
 
   addFirst(X, L, [X | L]).
 
-  shift_derecha(L,R):- ultimo(L,U),borrar(U,L,X),addFirst(U,X,R),!.
+  shift_derecha(L,R):- ultimo(L,U),addFirst(U,L,T),borrarUltimo(T,R),!.
 
   shift_izquierda([H|T],R):- borrar(H,[H|T],X), addLast(H,X,R),!.
+
+  borrarUltimo([_], []).
+  borrarUltimo([H, Next|T], [Head|NT]):-
+    borrarUltimo([Next|T], NT). 
 
   ultimo([H],H).
   ultimo([_H|T],R):- ultimo(T,R).
