@@ -21,6 +21,18 @@ obtenerFila(N,[_L1,_L2,_L3,_L4,L5],ListaD):-
   N is 5,
   ListaD = L5.
 
+
+setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[L,_L2,_L3,_L4,_L5]):-
+    N is 1.
+setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,L,_L3,_L4,_L5]):-
+    N is 2.
+setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,L,_L4,_L5]):-
+    N is 3.
+setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,_L3,L,_L5]):-
+    N is 4.
+setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,_L3,_L4,L]):-
+    N is 5.
+
 generarTablero(Tablero):-
    generarFila(F1),
    generarFila(F2),
@@ -42,10 +54,6 @@ generarFila(L):-
   add(C5,L4,L5),
   L = L5.
 
-/*corrimineto
-colapso
-acom*/
-
 
 add(Elem , Lista , ListaN):-
   Elem is 1,
@@ -59,13 +67,12 @@ add(Elem , Lista , ListaN):-
 
 
 
-/*desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
-  (Dir is 'der' ; Dir is 'izq'),
+desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
+  (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   C is Cant mod 5, %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
-  rotarHorizontal(Dir,C,Lista,ListaN).
-  //agregar fila nueva al tablero
-  //ver toda la movida de evoltablero*/
+  rotarHorizontal(Dir,C,Lista,ListaN),
+  setFila(Num,ListaN,Tablero,EvolTablero).%EvolTablero es el tablero con el desplazamiento y nada mas (POR AHORA)
 
 
 
@@ -93,7 +100,7 @@ rotarHorizontal(Sentido,Cant,Lista,ListaN):-
 
   shift_derecha(L,R):- ultimo(L,U),borrar(U,L,X),addFirst(U,X,R),!.
 
-  shift_izquierda([H|T],R):- borrar(H,[H|T],X), addLast(H,X,R).
+  shift_izquierda([H|T],R):- borrar(H,[H|T],X), addLast(H,X,R),!.
 
   ultimo([H],H).
   ultimo([_H|T],R):- ultimo(T,R).
@@ -121,7 +128,3 @@ shiftAux(Board, Columna, 4, E, NBoard):-
     reemplazar(Board, Columna, 0, _X, E).
 
 */
-
-
-/*cuando colapsan, agregar x en lugares vacios y luego
-reemplazarlos por random */
