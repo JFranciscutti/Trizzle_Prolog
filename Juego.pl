@@ -72,10 +72,18 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   obtenerFila(Num,Tablero,Lista),
   C is Cant mod 5, %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
   rotarFila(Dir,C,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,EvolTablero).%EvolTablero es el tablero con el desplazamiento y nada mas (POR AHORA)
-  %implementar colapsos
-  %agregar las X al tablero
-  %reemplazar X por randoms
+  setFila(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
+
+
+generarEvolTablero(Tablero,ListaTableros):-
+  addLast(Tablero,[],L1),
+  buscar_colapsos(Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
+  addLast(TColapsos,L1,L2),
+  agregar_x(TColapsos,TX), %llena de X los espacios en blanco.
+  addLast(TX,L2,L3),
+  randomPorX(TX,TFinal),%reemplaza las X por mamushkas random
+  addLast(TFinal,L3,ListaTableros).
 
 
 
