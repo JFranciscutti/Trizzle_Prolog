@@ -21,16 +21,16 @@ obtenerFila(N,[_L1,_L2,_L3,_L4,L5],ListaD):-
   N is 5,
   ListaD = L5.
 
-//los _L1.._L5 tiran mas singleton que la mierda, no se que onda
-setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[L,_L2,_L3,_L4,_L5]):-
+
+setFila(N,L,[_L1,L2,L3,L4,L5],[L,L2,L3,L4,L5]):-
     N is 1.
-setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,L,_L3,_L4,_L5]):-
+setFila(N,L,[L1,_L2,L3,L4,L5],[L1,L,L3,L4,L5]):-
     N is 2.
-setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,L,_L4,_L5]):-
+setFila(N,L,[L1,L2,_L3,L4,L5],[L1,L2,L,L4,L5]):-
     N is 3.
-setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,_L3,L,_L5]):-
+setFila(N,L,[L1,L2,L3,_L4,L5],[L1,L2,L3,L,L5]):-
     N is 4.
-setFila(N,L,[_L1,_L2,_L3,_L4,_L5],[_L1,_L2,_L3,_L4,L]):-
+setFila(N,L,[L1,L2,L3,L4,_L5],[L1,L2,L3,L4,L]):-
     N is 5.
 
 generarTablero(Tablero):-
