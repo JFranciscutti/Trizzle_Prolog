@@ -73,7 +73,9 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   C is Cant mod 5, %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
   rotarFila(Dir,C,Lista,ListaN),
   setFila(Num,ListaN,Tablero,EvolTablero).%EvolTablero es el tablero con el desplazamiento y nada mas (POR AHORA)
-
+  %implementar colapsos
+  %agregar las X al tablero
+  %reemplazar X por randoms
 
 
 
