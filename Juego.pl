@@ -104,28 +104,64 @@ add(Elem , Lista , ListaN):-
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
-  C is Cant mod 5, %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
-  rotar(Dir,C,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,EvolTablero).
-  %generarEvolTablero(TableroNuevo,EvolTablero).
+  rotar(Dir,Cant,Lista,ListaN),
+  setFila(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
     (Dir = 'abj' ; Dir = 'arb'),
     obtenerColumna(Num,Tablero,Lista),
-    C is Cant mod 5,  %verifico que el numero este entre 0 y 4 para no hacer movimientos redundantes
-    rotar(Dir,C,Lista,ListaN),
-    setColumna(Num,ListaN,Tablero,EvolTablero).
-    %generarEvolTablero(TableroNuevo,EvolTablero).
+    rotar(Dir,Cant,Lista,ListaN),
+    setColumna(Num,ListaN,Tablero,TableroNuevo),
+    generarEvolTablero(TableroNuevo,EvolTablero).
 
 
-/*generarEvolTablero(Tablero,ListaTableros):-
+generarEvolTablero(Tablero,ListaTableros):-
   addLast(Tablero,[],L1),
   buscar_colapsos(Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
   addLast(TColapsos,L1,L2),
-  agregar_x(TColapsos,TX), %llena de X los espacios en blanco.
-  addLast(TX,L2,L3),
-  randomPorX(TX,TFinal),%reemplaza las X por mamushkas random
-  addLast(TFinal,L3,ListaTableros).*/
+  gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
+  addLast(TGravedad,L2,L3),
+  randomPorX(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
+  addLast(TRandom,L3,ListaTableros).
+
+gravedad_columnas(Tablero,TableroN):-
+    obtenerColumna(1,Tablero,C1),
+    obtenerColumna(2,Tablero,C2),
+    obtenerColumna(3,Tablero,C3),
+    obtenerColumna(4,Tablero,C4),
+    obtenerColumna(5,Tablero,C5),
+    gravedad(C1,NC1),
+    gravedad(C2,NC2),
+    gravedad(C3,NC3),
+    gravedad(C4,NC4),
+    gravedad(C5,NC5),
+    setColumna(1,NC1,Tablero,T1),
+    setColumna(2,NC2,T2,T3),
+    setColumna(3,NC2,T3,T4),
+    setColumna(4,NC2,T4,T5),
+    setColumna(5,NC2,T5,TableroN).
+
+
+gravedad(Lista,ListaN):-
+      obtenerElems(Lista,ListaE),
+      size(ListaE,Cant),
+      C is 5 - Cant,
+      rellenar(C,ListaE,ListaN).
+
+obtenerElems([],[]).
+obtenerElems([H|T],ListaN):-
+      H = x ,
+      obtenerElems(T,ListaN).
+obtenerElems([H|T],[H|LN]):-
+      H \= x,
+      obtenerElems(T,LN).
+
+rellenar(0,Lista,Lista).
+rellenar(Cant,Lista,LN):-
+      C is Cant -1,
+      addFirst(x,Lista,ListaN),
+      rellenar(C,ListaN,LN).
 
 
 
@@ -156,10 +192,15 @@ rotar(Sentido,Cant,Lista,ListaN):-
 
   borrarUltimo([_], []).
   borrarUltimo([H, Next|T], [Head|NT]):-
-    borrarUltimo([Next|T], NT). 
+    borrarUltimo([Next|T], NT).
 
   ultimo([H],H).
   ultimo([_H|T],R):- ultimo(T,R).
 
   borrar(X,[X|T],T).
   borrar(X,[H|T],[H|R]):- borrar(X,T,R).
+
+  size([],0).
+  size([_|T],Num):-
+    size(T,Num2),
+    Num is Num2 +1.
