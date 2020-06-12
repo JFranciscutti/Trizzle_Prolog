@@ -36,6 +36,12 @@ obtenerColumna(Num,[L1,L2,L3,L4,L5],ListaN):-
     obtenerElem(Num,L5,E5),
     ListaN=[E1,E2,E3,E4,E5].
 
+/*
+  Num=posicion en la que quiero la columna,
+  [E1..E5]= columnna a insertar,
+  [L1..L5]= tablero en el que quiero insertar la columnna,
+  [NL1..NL5]= tablero con columna nueva.
+*/
 setColumna(Num,[E1,E2,E3,E4,E5],[L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
     setElem(E1,L1,Num,NL1),
     setElem(E2,L2,Num,NL2),
@@ -76,44 +82,48 @@ generarTablero(Tablero):-
    Tablero = [F1,F2,F3,F4,F5].
 
 generarFila(L):-
-  random(1,4,C1),
-  add(C1,[],L1),
-  random(1,4,C2),
-  add(C2,L1,L2),
-  random(1,4,C3),
-  add(C3,L2,L3),
-  random(1,4,C4),
-  add(C4,L3,L4),
-  random(1,4,C5),
-  add(C5,L4,L5),
-  L = L5.
+    random(1,4,E1),
+    mamushka(E1,C1),
+    addLast(C1,[],L1),
+    random(1,4,E2),
+    mamushka(E2,C2),
+    addLast(C2,L1,L2),
+    random(1,4,E3),
+    mamushka(E3,C3),
+    addLast(C3,L2,L3),
+    random(1,4,E4),
+    mamushka(E4,C4),
+    addLast(C4,L3,L4),
+    random(1,4,E5),
+    mamushka(E5,C5),
+    addLast(C5,L4,L5),
+    L = L5.
 
-
-add(Elem , Lista , ListaN):-
-  Elem is 1,
-  addLast(a1,Lista,ListaN).
-add(Elem , Lista , ListaN):-
-    Elem is 2,
-    addLast(r1,Lista,ListaN).
-add(Elem , Lista , ListaN):-
-  Elem is 3,
-  addLast(v1,Lista,ListaN).
-
-
+mamushka(E,Elem):-
+    E is 1,
+    Elem = a1.
+mamushka(E,Elem):-
+    E is 2,
+    Elem = r1.
+mamushka(E,Elem):-
+    E is 3,
+    Elem = v1.
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,TableroNuevo),
-  generarEvolTablero(TableroNuevo,EvolTablero).
+ % setFila(Num,ListaN,Tablero,TableroNuevo),
+  setFila(Num,ListaN,Tablero,EvolTablero).
+ % generarEvolTablero(TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
     (Dir = 'abj' ; Dir = 'arb'),
     obtenerColumna(Num,Tablero,Lista),
     rotar(Dir,Cant,Lista,ListaN),
-    setColumna(Num,ListaN,Tablero,TableroNuevo),
-    generarEvolTablero(TableroNuevo,EvolTablero).
+    %setColumna(Num,ListaN,Tablero,TableroNuevo),
+    setColumna(Num,ListaN,Tablero,EvolTablero).
+   % generarEvolTablero(TableroNuevo,EvolTablero).
 
 
 generarEvolTablero(Tablero,ListaTableros):-
@@ -137,10 +147,10 @@ gravedad_columnas(Tablero,TableroN):-
     gravedad(C4,NC4),
     gravedad(C5,NC5),
     setColumna(1,NC1,Tablero,T1),
-    setColumna(2,NC2,T2,T3),
-    setColumna(3,NC2,T3,T4),
-    setColumna(4,NC2,T4,T5),
-    setColumna(5,NC2,T5,TableroN).
+    setColumna(2,NC2,T1,T2),
+    setColumna(3,NC3,T2,T3),
+    setColumna(4,NC4,T3,T4),
+    setColumna(5,NC5,T4,TableroN).
 
 
 gravedad(Lista,ListaN):-
@@ -191,7 +201,7 @@ rotar(Sentido,Cant,Lista,ListaN):-
   shift_izquierda([H|T],R):- borrar(H,[H|T],X), addLast(H,X,R),!.
 
   borrarUltimo([_], []).
-  borrarUltimo([H, Next|T], [Head|NT]):-
+  borrarUltimo([H, Next|T], [H|NT]):-
     borrarUltimo([Next|T], NT).
 
   ultimo([H],H).
