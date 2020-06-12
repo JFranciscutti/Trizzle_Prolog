@@ -82,20 +82,20 @@ generarTablero(Tablero):-
    Tablero = [F1,F2,F3,F4,F5].
 
 generarFila(L):-
-    random(1,4,E1),
-    mamushka(E1,C1),
-    addLast(C1,[],L1),
+    random(1,4,E1), %genera un random entre 1 y 4 (4 excluido)
+    mamushka(E1,C1), %dado el random, genera la mamushka v1, r1 o a1
     random(1,4,E2),
     mamushka(E2,C2),
-    addLast(C2,L1,L2),
     random(1,4,E3),
     mamushka(E3,C3),
-    addLast(C3,L2,L3),
     random(1,4,E4),
     mamushka(E4,C4),
-    addLast(C4,L3,L4),
     random(1,4,E5),
     mamushka(E5,C5),
+    addLast(C1,[],L1),
+    addLast(C2,L1,L2),
+    addLast(C3,L2,L3),
+    addLast(C4,L3,L4),
     addLast(C5,L4,L5),
     L = L5.
 
@@ -132,8 +132,10 @@ generarEvolTablero(Tablero,ListaTableros):-
   addLast(TColapsos,L1,L2),
   gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
-  randomPorX(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
+  random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
   addLast(TRandom,L3,ListaTableros).
+
+
 
 gravedad_columnas(Tablero,TableroN):-
     obtenerColumna(1,Tablero,C1),
@@ -172,6 +174,25 @@ rellenar(Cant,Lista,LN):-
       C is Cant -1,
       addFirst(x,Lista,ListaN),
       rellenar(C,ListaN,LN).
+
+
+random_tablero([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
+  randomPorX(L1,NL1),
+  randomPorX(L2,NL2),
+  randomPorX(L3,NL3),
+  randomPorX(L4,NL4),
+  randomPorX(L5,NL5).
+
+
+randomPorX([],[]).
+randomPorX([H|T],[Elem|LN]):-
+      H = x,
+      random(1,4,E),
+      mamushka(E,Elem),
+      randomPorX(T,LN).
+randomPorX([H|T],[H|LN]):-
+      H \= x,
+      randomPorX(T,LN).
 
 
 
