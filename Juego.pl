@@ -152,7 +152,7 @@ gravedad_columnas(Tablero,TableroN):-
     setColumna(2,NC2,T1,T2),
     setColumna(3,NC3,T2,T3),
     setColumna(4,NC4,T3,T4),
-    setColumna(5,NC5,T4,TableroN).
+    setColumna(5,NC5,T4,TableroN),!.
 
 
 gravedad(Lista,ListaN):-
@@ -181,7 +181,7 @@ random_tablero([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   randomPorX(L2,NL2),
   randomPorX(L3,NL3),
   randomPorX(L4,NL4),
-  randomPorX(L5,NL5).
+  randomPorX(L5,NL5),!.
 
 
 randomPorX([],[]).
