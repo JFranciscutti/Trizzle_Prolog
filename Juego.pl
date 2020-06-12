@@ -1,8 +1,16 @@
 :- use_rendering(table).
 
-obtenerT(X,1):- member(X,[v1,a1,r1]).
-obtenerT(X,2):- member(X,[v2,a2,r2]).
-obtenerT(X,3):- member(X,[v3,a3,r3]).
+upgrade(v1,v2).
+upgrade(v2,v3).
+upgrade(v3,v3).
+
+upgrade(a1,a2).
+upgrade(a2,a3).
+upgrade(a3,a3).
+
+upgrade(r1,r2).
+upgrade(r2,r3).
+upgrade(r3,r3).
 
 
 obtenerFila(N,[L1,_L2,_L3,_L4,_L5],L1):-
@@ -113,17 +121,15 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
- % setFila(Num,ListaN,Tablero,TableroNuevo),
-  setFila(Num,ListaN,Tablero,EvolTablero).
- % generarEvolTablero(TableroNuevo,EvolTablero).
+  setFila(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
   obtenerColumna(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  %setColumna(Num,ListaN,Tablero,TableroNuevo),
-  setColumna(Num,ListaN,Tablero,EvolTablero).
-  % generarEvolTablero(TableroNuevo,EvolTablero).
+  setColumna(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
 
 
 generarEvolTablero(Tablero,ListaTableros):-
@@ -135,7 +141,71 @@ generarEvolTablero(Tablero,ListaTableros):-
   random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
   addLast(TRandom,L3,ListaTableros).
 
+buscar_colapsos(Tablero,TableroN):-
+  buscar_en_filas(Tablero,TN),
+  buscar_en_columnas(TN,TableroN).
 
+buscar_en_filas([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
+  colapsar_lista(L1,NL1),
+  colapsar_lista(L2,NL2),
+  colapsar_lista(L3,NL3),
+  colapsar_lista(L4,NL4),
+  colapsar_lista(L5,NL5).
+
+buscar_en_columnas(Tablero,TableroN):-
+  obtenerColumna(1,Tablero,C1),
+  obtenerColumna(2,Tablero,C2),
+  obtenerColumna(3,Tablero,C3),
+  obtenerColumna(4,Tablero,C4),
+  obtenerColumna(5,Tablero,C5),
+  colapsar_lista(C1,NC1),
+  colapsar_lista(C2,NC2),
+  colapsar_lista(C3,NC3),
+  colapsar_lista(C4,NC4),
+  colapsar_lista(C5,NC5),
+  setColumna(1,NC1,Tablero,T1),
+  setColumna(2,NC2,T1,T2),
+  setColumna(3,NC3,T2,T3),
+  setColumna(4,NC4,T3,T4),
+  setColumna(5,NC5,T4,TableroN),!.
+
+
+  colapsar_lista(L,LN):-
+      iguales_cinco(L,LN),!.
+  colapsar_lista(L,LN):-
+      iguales_cuatro(L,LN),!.
+  colapsar_lista(L,LN):-
+      iguales_tres(L,LN),!.
+  colapsar_lista(L,L).
+
+
+  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
+      (E1=E2,E2=E3),
+      upgrade(E3,NE3),
+      ListaN=[x,x,NE3,E4,E5].
+  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
+      (E2=E3,E3=E4),
+      upgrade(E4,NE4),
+      ListaN=[E1,x,x,NE4,E5].
+
+  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
+      (E3=E4,E4=E5),
+      upgrade(E5,NE5),
+      ListaN=[E1,E2,x,x,NE5].
+
+  iguales_cuatro([E1,E2,E3,E4,E5],ListaN):-
+      (E1=E2,E2=E3,E3=E4),
+      upgrade(E4,NE4),
+      ListaN=[x,x,x,NE4,E5].
+  iguales_cuatro([E1,E2,E3,E4,E5],ListaN):-
+      (E2=E3,E3=E4,E4=E5),
+      upgrade(E5,NE5),
+      ListaN=[E1,x,x,x,NE5].
+
+  iguales_cinco([E1,E2,E3,E4,E5],ListaN):-
+      (E1=E2,E2=E3,E3=E4,E4=E5),
+      upgrade(E3,NE3),
+      ListaN=[x,x,NE3,x,x].
 
 gravedad_columnas(Tablero,TableroN):-
   obtenerColumna(1,Tablero,C1),
