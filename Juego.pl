@@ -159,7 +159,7 @@ gravedad(Lista,ListaN):-
       obtenerElems(Lista,ListaE),
       size(ListaE,Cant),
       C is 5 - Cant,
-      rellenar(C,ListaE,ListaN).
+      rellenar(C,ListaE,ListaN),!.
 
 obtenerElems([],[]).
 obtenerElems([H|T],ListaN):-
