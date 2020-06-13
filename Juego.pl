@@ -121,15 +121,15 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,EvolTablero).
-  %generarEvolTablero(TableroNuevo,EvolTablero).
+  setFila(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
   obtenerColumna(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  setColumna(Num,ListaN,Tablero,EvolTablero).
-  %generarEvolTablero(TableroNuevo,EvolTablero).
+  setColumna(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(TableroNuevo,EvolTablero).
 
 
 generarEvolTablero(Tablero,ListaTableros):-
