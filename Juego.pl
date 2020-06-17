@@ -181,17 +181,17 @@ buscar_en_columnas(Tablero,TableroN):-
 
   iguales_tres([E1,E2,E3,E4,E5],ListaN):-
       (E1=E2,E2=E3),
-      upgrade(E2,NE2),
-      ListaN=[x,NE2,x,E4,E5].
+      upgrade(E3,NE3),
+      ListaN=[x,x,NE3,E4,E5].
   iguales_tres([E1,E2,E3,E4,E5],ListaN):-
       (E2=E3,E3=E4),
-      upgrade(E3,NE3),
-      ListaN=[E1,x,NE3,x,E5].
+      upgrade(E4,NE4),
+      ListaN=[E1,x,x,NE4,E5].
 
   iguales_tres([E1,E2,E3,E4,E5],ListaN):-
       (E3=E4,E4=E5),
-      upgrade(E4,NE4),
-      ListaN=[E1,E2,x,NE4,x].
+      upgrade(E5,NE5),
+      ListaN=[E1,E2,x,x,NE5].
 
   iguales_cuatro([E1,E2,E3,E4,E5],ListaN):-
       (E1=E2,E2=E3,E3=E4),
