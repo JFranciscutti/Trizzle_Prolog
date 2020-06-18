@@ -122,7 +122,7 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
   setFila(Num,ListaN,Tablero,TableroNuevo),
-  generarEvolTablero(TableroNuevo,EvolTablero).
+  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
@@ -154,14 +154,73 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
 
 
 buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
-  %buscar colapso en la fila actual
-  %si hay colapso, buscar algun cruce con alguna columna que colapse tambien
-  %meterle mamushka grande en la interseccion de ambas
-
-
+  obtenerFila(NumFila,Tablero,Fila),
+  hay_colapso(Fila),
+  buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo).
 
 buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
   buscar_en_columnas(NumFila,Tablero,TableroNuevo).
+
+
+hay_colapso(Fila):-
+  iguales_cuatro(3,Fila,_FilaNueva);
+  iguales_tres(3,Fila,_FilaNueva),!.
+
+buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo):-
+  Cont is 1,
+  buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo).
+
+buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  obtenerElem(Columna,NumFila,Elem),
+  cruzar(Cont,Elem,Fila,FilaNueva),
+  colapsar_lista(NumFila,Columna,ColNueva),
+  setFila(NumFila,FilaNueva,Tablero,TNuevo),
+  setColumna(Cont,ColNueva,TNuevo,TNuevo1),
+  C is Cont + 1,
+  buscar_en_columnas_cruce_aux(C,NumFila,FilaNueva,TNuevo1,TableroNuevo).
+
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 1;Cont = 2; Cont = 3),
+  Elem = E1,
+  E1 = E2,
+  E2 = E3,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 2;Cont = 3; Cont = 4),
+  Elem = E2,
+  E2 = E3,
+  E3 = E4,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 3; Cont = 4, Cont = 5),
+  Elem = E3,
+  E3 = E4,
+  E4 = E5,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
+  Elem = E1,
+  E1 = E2,
+  E2 = E3,
+  E3 = E4,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
+  Elem = E2,
+  E2 = E3,
+  E3 = E4,
+  E4 = E5,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+
 
 buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
   Cont is 1,
@@ -170,21 +229,16 @@ buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
 buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
-  %obtenerFila(NumFila,Tablero,Fila),
-  %colapsar_lista(Cont,Fila,FilaNueva),
   colapsar_lista(NumFila,Columna,ColNueva),
   setColumna(Cont,ColNueva,Tablero,TN),
-  %setFila(NumFila,FilaNueva,TN,TN1)
   C is Cont + 1,
-  buscar_en_columnasAux(C,NumFila,TN1,TableroNuevo).
+  buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
 
-  %hay que hacer un colapsar lista nuevo
 
 buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
-  %buscar colapso en la columna actual
-  %si hay colapso, buscar algun cruce con alguna fila que colapse tambien
-  %meterle mamushka grande en la interseccion de ambas
-
+  obtenerColumna(NumCol,Tablero,Columna),
+  hay_colapso(Columna),
+  buscar_en_filas_cruce(NumCol,Columna,Tablero,TableroNuevo).
 buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
   buscar_en_filas(NumCol,Tablero,TableroNuevo).
 
@@ -201,6 +255,20 @@ buscar_en_filasAux(Cont,NumCol,Tablero,TableroNuevo):-
   buscar_en_filasAux(C,NumCol,TN,TableroNuevo).
 
 
+buscar_en_filas_cruce(NumCol,Columna,Tablero,TableroNuevo):-
+  Cont is 1,
+  buscar_en_filas_cruce_aux(Cont,NumCol,Columna,Tablero,TableroNuevo).
+
+buscar_en_filas_cruce_aux(Cont,NumCol,Columna,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerFila(Cont,Tablero,Fila),
+  obtenerElem(Fila,NumCol,Elem),
+  cruzar(Cont,Elem,Columna,ColNueva),
+  colapsar_lista(NumCol,Fila,FilaNueva),
+  setColumna(NumCol,ColNueva,Tablero,TNuevo),
+  setFila(Cont,FilaNueva,TNuevo,TNuevo1),
+  C is Cont + 1,
+  buscar_en_filas_cruce_aux(C,NumCol,ColNueva,TNuevo1,TableroNuevo).
 
 
 colapsar_lista(Num,L,LN):-
@@ -210,7 +278,7 @@ colapsar_lista(Num,L,LN):-
 colapsar_lista(Num,L,LN):-
   iguales_tres(Num,L,LN),
   !.
-colapsar_lista(Num,L,L).
+colapsar_lista(_Num,L,L).
 
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
