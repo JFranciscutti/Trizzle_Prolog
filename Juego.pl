@@ -129,83 +129,119 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   obtenerColumna(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
   setColumna(Num,ListaN,Tablero,TableroNuevo),
-  generarEvolTablero(TableroNuevo,EvolTablero).
+  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 
-generarEvolTablero(Tablero,ListaTableros):-
+generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
+  (Dir = 'abj' ; Dir = 'arb'),
   addLast(Tablero,[],L1),
-  buscar_colapsos(Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
+  buscar_colapsos_vert(Num,Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
   addLast(TColapsos,L1,L2),
   gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
   random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
   addLast(TRandom,L3,ListaTableros).
 
-buscar_colapsos(Tablero,TableroN):-
-  buscar_en_filas(Tablero,TN),
-  buscar_en_columnas(TN,TableroN).
-
-buscar_en_filas([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
-  colapsar_lista(L1,NL1),
-  colapsar_lista(L2,NL2),
-  colapsar_lista(L3,NL3),
-  colapsar_lista(L4,NL4),
-  colapsar_lista(L5,NL5).
-
-buscar_en_columnas(Tablero,TableroN):-
-  obtenerColumna(1,Tablero,C1),
-  obtenerColumna(2,Tablero,C2),
-  obtenerColumna(3,Tablero,C3),
-  obtenerColumna(4,Tablero,C4),
-  obtenerColumna(5,Tablero,C5),
-  colapsar_lista(C1,NC1),
-  colapsar_lista(C2,NC2),
-  colapsar_lista(C3,NC3),
-  colapsar_lista(C4,NC4),
-  colapsar_lista(C5,NC5),
-  setColumna(1,NC1,Tablero,T1),
-  setColumna(2,NC2,T1,T2),
-  setColumna(3,NC3,T2,T3),
-  setColumna(4,NC4,T3,T4),
-  setColumna(5,NC5,T4,TableroN),!.
+generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
+  (Dir = 'der' ; Dir = 'izq'),
+  addLast(Tablero,[],L1),
+  buscar_colapsos_hor(Num,Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
+  addLast(TColapsos,L1,L2),
+  gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
+  addLast(TGravedad,L2,L3),
+  random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
+  addLast(TRandom,L3,ListaTableros).
 
 
-  colapsar_lista(L,LN):-
-      iguales_cinco(L,LN),!.
-  colapsar_lista(L,LN):-
-      iguales_cuatro(L,LN),!.
-  colapsar_lista(L,LN):-
-      iguales_tres(L,LN),!.
-  colapsar_lista(L,L).
+buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
+  %buscar colapso en la fila actual
+  %si hay colapso, buscar algun cruce con alguna columna que colapse tambien
+  %meterle mamushka grande en la interseccion de ambas
 
 
-  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
-      (E1=E2,E2=E3),
-      upgrade(E3,NE3),
-      ListaN=[x,x,NE3,E4,E5].
-  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
-      (E2=E3,E3=E4),
-      upgrade(E4,NE4),
-      ListaN=[E1,x,x,NE4,E5].
 
-  iguales_tres([E1,E2,E3,E4,E5],ListaN):-
-      (E3=E4,E4=E5),
-      upgrade(E5,NE5),
-      ListaN=[E1,E2,x,x,NE5].
+buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
+  buscar_en_columnas(NumFila,Tablero,TableroNuevo).
 
-  iguales_cuatro([E1,E2,E3,E4,E5],ListaN):-
-      (E1=E2,E2=E3,E3=E4),
-      upgrade(E4,NE4),
-      ListaN=[x,x,x,NE4,E5].
-  iguales_cuatro([E1,E2,E3,E4,E5],ListaN):-
-      (E2=E3,E3=E4,E4=E5),
-      upgrade(E5,NE5),
-      ListaN=[E1,x,x,x,NE5].
+buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
+  Cont is 1,
+  buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo).
 
-  iguales_cinco([E1,E2,E3,E4,E5],ListaN):-
-      (E1=E2,E2=E3,E3=E4,E4=E5),
-      upgrade(E3,NE3),
-      ListaN=[x,x,NE3,x,x].
+buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  %obtenerFila(NumFila,Tablero,Fila),
+  %colapsar_lista(Cont,Fila,FilaNueva),
+  colapsar_lista(NumFila,Columna,ColNueva),
+  setColumna(Cont,ColNueva,Tablero,TN),
+  %setFila(NumFila,FilaNueva,TN,TN1)
+  C is Cont + 1,
+  buscar_en_columnasAux(C,NumFila,TN1,TableroNuevo).
+
+  %hay que hacer un colapsar lista nuevo
+
+buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
+  %buscar colapso en la columna actual
+  %si hay colapso, buscar algun cruce con alguna fila que colapse tambien
+  %meterle mamushka grande en la interseccion de ambas
+
+buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
+  buscar_en_filas(NumCol,Tablero,TableroNuevo).
+
+buscar_en_filas(NumCol,Tablero,TableroNuevo):-
+  Cont is 1,
+  buscar_en_filasAux(Cont,NumCol,Tablero,TableroNuevo).
+
+buscar_en_filasAux(Cont,NumCol,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerFila(Cont,Tablero,Fila),
+  colapsar_lista(NumCol,Fila,FilaNueva),
+  setFila(Cont,FilaNueva,Tablero,TN),
+  C is Cont + 1,
+  buscar_en_filasAux(C,NumCol,TN,TableroNuevo).
+
+
+
+
+colapsar_lista(Num,L,LN):-
+  iguales_cuatro(Num,L,LN),
+  !.
+
+colapsar_lista(Num,L,LN):-
+  iguales_tres(Num,L,LN),
+  !.
+colapsar_lista(Num,L,L).
+
+
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+  (E1=E2,E2=E3),
+  LN = [x,x,x,E4,E5],
+  upgrade(E1,NElem),
+  setElem(NElem,LN,Num,ListaN).
+
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+  (E2=E3,E3=E4),
+  LN=[E1,x,x,x,E5],
+  upgrade(E2,NElem),
+  setElem(NElem,LN,Num,ListaN).
+
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+  (E3=E4,E4=E5),
+  LN=[E1,E2,x,x,x],
+  upgrade(E3,NElem),
+  setElem(NElem,LN,Num,ListaN).
+
+iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
+  (E1=E2,E2=E3,E3=E4),
+  LN=[x,x,x,x,E5],
+  upgrade(E4,NElem),
+  setElem(NElem,LN,Num,ListaN).
+
+iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
+  (E2=E3,E3=E4,E4=E5),
+  LN=[E1,x,x,x,x],
+  upgrade(E5,NElem),
+  setElem(NElem,LN,Num,ListaN).
 
 gravedad_columnas(Tablero,TableroN):-
   obtenerColumna(1,Tablero,C1),
