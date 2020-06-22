@@ -122,7 +122,7 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
   setFila(Num,ListaN,Tablero,TableroNuevo),
-  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
+ generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
@@ -159,6 +159,8 @@ buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
   buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo).
 
 buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
+  obtenerFila(NumFila,Tablero,Fila),
+  not(hay_colapso(Fila)),
   buscar_en_columnas(NumFila,Tablero,TableroNuevo).
 
 
@@ -173,13 +175,26 @@ buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo):-
 buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
-  obtenerElem(Columna,NumFila,Elem),
+  hay_colapso(Columna),
+  obtenerElem(NumFila,Columna,Elem),
   cruzar(Cont,Elem,Fila,FilaNueva),
   colapsar_lista(NumFila,Columna,ColNueva),
   setFila(NumFila,FilaNueva,Tablero,TNuevo),
   setColumna(Cont,ColNueva,TNuevo,TNuevo1),
   C is Cont + 1,
   buscar_en_columnas_cruce_aux(C,NumFila,FilaNueva,TNuevo1,TableroNuevo).
+
+buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  not(hay_colapso(Columna)),
+  C is Cont + 1,
+  buscar_en_columnas_cruce_aux(C,NumFila,Fila,Tablero,TableroNuevo).
+
+
+buscar_en_columnas_cruce_aux(6,_NumFila,_Fila,Tablero,TableroNuevo):-
+    TableroNuevo = Tablero.
+
 
 
 cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
@@ -233,6 +248,9 @@ buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   setColumna(Cont,ColNueva,Tablero,TN),
   C is Cont + 1,
   buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
+buscar_en_columnasAux(6,_NumFila,Tablero,TableroNuevo):-
+    TableroNuevo = Tablero.
+
 
 
 buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
@@ -312,22 +330,17 @@ iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
   setElem(NElem,LN,Num,ListaN).
 
 gravedad_columnas(Tablero,TableroN):-
-  obtenerColumna(1,Tablero,C1),
-  obtenerColumna(2,Tablero,C2),
-  obtenerColumna(3,Tablero,C3),
-  obtenerColumna(4,Tablero,C4),
-  obtenerColumna(5,Tablero,C5),
-  gravedad(C1,NC1),
-  gravedad(C2,NC2),
-  gravedad(C3,NC3),
-  gravedad(C4,NC4),
-  gravedad(C5,NC5),
-  setColumna(1,NC1,Tablero,T1),
-  setColumna(2,NC2,T1,T2),
-  setColumna(3,NC3,T2,T3),
-  setColumna(4,NC4,T3,T4),
-  setColumna(5,NC5,T4,TableroN),!.
-
+  Cont = 1,
+  gravedad_columnas_aux(Cont,Tablero,TableroN).
+gravedad_columnas_aux(Cont,Tablero,TableroN):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  gravedad(Columna,ColNueva),
+  setColumna(Cont,ColNueva,Tablero,TN),
+  C is Cont + 1,
+  gravedad_columnas_aux(C,TN,TableroN).
+gravedad_columnas_aux(6,Tablero,TableroN):-
+    TableroN = Tablero.
 
 gravedad(Lista,ListaN):-
   obtenerElems(Lista,ListaE),
