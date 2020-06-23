@@ -118,7 +118,7 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   addLast(Tablero,[],L1),
   transpose(Tablero,TableroTrasp),
   buscar_colapsos(Num,TableroTrasp,TColapsos),%genera colapsos si existen dsp de un desplazamiento
-  transpose(TColapsos,TColapsosN)
+  transpose(TColapsos,TColapsosN),
   addLast(TColapsosN,L1,L2),
   gravedad_columnas(TColapsosN,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
@@ -139,7 +139,7 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
 buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   hay_colapso(Fila),
-  buscar_en_columnas_cruce(NumFila,Fila,Tablero,TNuevo),
+  buscar_cruce(NumFila,Fila,Tablero,TNuevo),
   obtenerFila(NumFila,TNuevo,FilaNueva),
   colapsar_lista(3,FilaNueva,FilaN),
   setFila(NumFila,FilaN,TNuevo,TableroNuevo),!.
