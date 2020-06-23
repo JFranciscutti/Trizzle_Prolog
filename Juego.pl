@@ -13,28 +13,18 @@ upgrade(r2,r3).
 upgrade(r3,r3).
 
 
-obtenerFila(N,[L1,_L2,_L3,_L4,_L5],L1):-
-  N is 1.
-obtenerFila(N,[_L1,L2,_L3,_L4,_L5],L2):-
-  N is 2.
-obtenerFila(N,[_L1,_L2,L3,_L4,_L5],L3):-
-  N is 3.
-obtenerFila(N,[_L1,_L2,_L3,L4,_L5],L4):-
-  N is 4.
-obtenerFila(N,[_L1,_L2,_L3,_L4,L5],L5):-
-  N is 5.
+obtenerFila(1,[L1,_L2,_L3,_L4,_L5],L1).
+obtenerFila(2,[_L1,L2,_L3,_L4,_L5],L2).
+obtenerFila(3,[_L1,_L2,L3,_L4,_L5],L3).
+obtenerFila(4,[_L1,_L2,_L3,L4,_L5],L4).
+obtenerFila(5,[_L1,_L2,_L3,_L4,L5],L5).
 
 
-setFila(N,L,[_L1,L2,L3,L4,L5],[L,L2,L3,L4,L5]):-
-  N is 1.
-setFila(N,L,[L1,_L2,L3,L4,L5],[L1,L,L3,L4,L5]):-
-  N is 2.
-setFila(N,L,[L1,L2,_L3,L4,L5],[L1,L2,L,L4,L5]):-
-  N is 3.
-setFila(N,L,[L1,L2,L3,_L4,L5],[L1,L2,L3,L,L5]):-
-  N is 4.
-setFila(N,L,[L1,L2,L3,L4,_L5],[L1,L2,L3,L4,L]):-
-  N is 5.
+setFila(1,L,[_L1,L2,L3,L4,L5],[L,L2,L3,L4,L5]).
+setFila(2,L,[L1,_L2,L3,L4,L5],[L1,L,L3,L4,L5]).
+setFila(3,L,[L1,L2,_L3,L4,L5],[L1,L2,L,L4,L5]).
+setFila(4,L,[L1,L2,L3,_L4,L5],[L1,L2,L3,L,L5]).
+setFila(5,L,[L1,L2,L3,L4,_L5],[L1,L2,L3,L4,L]).
 
 obtenerColumna(Num,[L1,L2,L3,L4,L5],ListaN):-
   obtenerElem(Num,L1,E1),
@@ -58,27 +48,17 @@ setColumna(Num,[E1,E2,E3,E4,E5],[L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   setElem(E5,L5,Num,NL5).
 
 
-obtenerElem(Num,[E1,_E2,_E3,_E4,_E5],E1):-
-  Num is 1.
-obtenerElem(Num,[_E1,E2,_E3,_E4,_E5],E2):-
-  Num is 2.
-obtenerElem(Num,[_E1,_E2,E3,_E4,_E5],E3):-
-  Num is 3.
-obtenerElem(Num,[_E1,_E2,_E3,E4,_E5],E4):-
-  Num is 4.
-obtenerElem(Num,[_E1,_E2,_E3,_E4,E5],E5):-
-  Num is 5.
+obtenerElem(1,[E1,_E2,_E3,_E4,_E5],E1).
+obtenerElem(2,[_E1,E2,_E3,_E4,_E5],E2).
+obtenerElem(3,[_E1,_E2,E3,_E4,_E5],E3).
+obtenerElem(4,[_E1,_E2,_E3,E4,_E5],E4).
+obtenerElem(5,[_E1,_E2,_E3,_E4,E5],E5).
 
-setElem(Elem,[_E1,E2,E3,E4,E5],Pos,[Elem,E2,E3,E4,E5]):-
-  Pos is 1.
-setElem(Elem,[E1,_E2,E3,E4,E5],Pos,[E1,Elem,E3,E4,E5]):-
-  Pos is 2.
-setElem(Elem,[E1,E2,_E3,E4,E5],Pos,[E1,E2,Elem,E4,E5]):-
-  Pos is 3.
-setElem(Elem,[E1,E2,E3,_E4,E5],Pos,[E1,E2,E3,Elem,E5]):-
-  Pos is 4.
-setElem(Elem,[E1,E2,E3,E4,_E5],Pos,[E1,E2,E3,E4,Elem]):-
-  Pos is 5.
+setElem(Elem,[_E1,E2,E3,E4,E5],1,[Elem,E2,E3,E4,E5]).
+setElem(Elem,[E1,_E2,E3,E4,E5],2,[E1,Elem,E3,E4,E5]).
+setElem(Elem,[E1,E2,_E3,E4,E5],3,[E1,E2,Elem,E4,E5]).
+setElem(Elem,[E1,E2,E3,_E4,E5],4,[E1,E2,E3,Elem,E5]).
+setElem(Elem,[E1,E2,E3,E4,_E5],5,[E1,E2,E3,E4,Elem]).
 
 
 generarTablero(Tablero):-
@@ -156,12 +136,15 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
 buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   hay_colapso(Fila),
-  buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo).
+  buscar_en_columnas_cruce(NumFila,Fila,Tablero,TNuevo),
+  obtenerFila(NumFila,TNuevo,FilaNueva),
+  colapsar_lista(3,FilaNueva,FilaN),
+  setFila(NumFila,FilaN,TNuevo,TableroNuevo),!.
 
 buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   not(hay_colapso(Fila)),
-  buscar_en_columnas(NumFila,Tablero,TableroNuevo).
+  buscar_en_columnas(NumFila,Tablero,TableroNuevo),!.
 
 
 hay_colapso(Fila):-
@@ -190,6 +173,17 @@ buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   not(hay_colapso(Columna)),
   C is Cont + 1,
   buscar_en_columnas_cruce_aux(C,NumFila,Fila,Tablero,TableroNuevo).
+
+buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  hay_colapso(Columna),
+  obtenerElem(NumFila,Columna,Elem),
+  not(cruzar(Cont,Elem,Fila,FilaNueva)),
+  colapsar_lista(NumFila,Columna,ColNueva),
+  setColumna(Cont,ColNueva,Tablero,TNuevo),
+  C is Cont + 1,
+  buscar_en_columnas_cruce_aux(C,NumFila,FilaNueva,TNuevo,TableroNuevo).
 
 
 buscar_en_columnas_cruce_aux(6,_NumFila,_Fila,Tablero,TableroNuevo):-
