@@ -1,4 +1,5 @@
 :- use_rendering(table).
+:- use_module(library(clpfd)).
 
 upgrade(v1,v2).
 upgrade(v2,v3).
@@ -102,7 +103,7 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
   setFila(Num,ListaN,Tablero,TableroNuevo),
- generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
+  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
@@ -115,9 +116,11 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
 generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   (Dir = 'abj' ; Dir = 'arb'),
   addLast(Tablero,[],L1),
-  buscar_colapsos_vert(Num,Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
-  addLast(TColapsos,L1,L2),
-  gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
+  transpose(Tablero,TableroTrasp),
+  buscar_colapsos(Num,TableroTrasp,TColapsos),%genera colapsos si existen dsp de un desplazamiento
+  transpose(TColapsos,TColapsosN)
+  addLast(TColapsosN,L1,L2),
+  gravedad_columnas(TColapsosN,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
   random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
   addLast(TRandom,L3,ListaTableros).
@@ -125,7 +128,7 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
 generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   (Dir = 'der' ; Dir = 'izq'),
   addLast(Tablero,[],L1),
-  buscar_colapsos_hor(Num,Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
+  buscar_colapsos(Num,Tablero,TColapsos),%genera colapsos si existen dsp de un desplazamiento
   addLast(TColapsos,L1,L2),
   gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
@@ -133,7 +136,7 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   addLast(TRandom,L3,ListaTableros).
 
 
-buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
+buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   hay_colapso(Fila),
   buscar_en_columnas_cruce(NumFila,Fila,Tablero,TNuevo),
@@ -141,7 +144,7 @@ buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
   colapsar_lista(3,FilaNueva,FilaN),
   setFila(NumFila,FilaN,TNuevo,TableroNuevo),!.
 
-buscar_colapsos_hor(NumFila,Tablero,TableroNuevo):-
+buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   not(hay_colapso(Fila)),
   buscar_en_columnas(NumFila,Tablero,TableroNuevo),!.
@@ -151,11 +154,11 @@ hay_colapso(Fila):-
   iguales_cuatro(3,Fila,_FilaNueva);
   iguales_tres(3,Fila,_FilaNueva),!.
 
-buscar_en_columnas_cruce(NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce(NumFila,Fila,Tablero,TableroNuevo):-
   Cont is 1,
-  buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo).
+  buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo).
 
-buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
   hay_colapso(Columna),
@@ -165,16 +168,16 @@ buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   setFila(NumFila,FilaNueva,Tablero,TNuevo),
   setColumna(Cont,ColNueva,TNuevo,TNuevo1),
   C is Cont + 1,
-  buscar_en_columnas_cruce_aux(C,NumFila,FilaNueva,TNuevo1,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,FilaNueva,TNuevo1,TableroNuevo).
 
-buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
   not(hay_colapso(Columna)),
   C is Cont + 1,
-  buscar_en_columnas_cruce_aux(C,NumFila,Fila,Tablero,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,Fila,Tablero,TableroNuevo).
 
-buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
   hay_colapso(Columna),
@@ -183,13 +186,24 @@ buscar_en_columnas_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
   colapsar_lista(NumFila,Columna,ColNueva),
   setColumna(Cont,ColNueva,Tablero,TNuevo),
   C is Cont + 1,
-  buscar_en_columnas_cruce_aux(C,NumFila,FilaNueva,TNuevo,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,FilaNueva,TNuevo,TableroNuevo).
 
 
-buscar_en_columnas_cruce_aux(6,_NumFila,_Fila,Tablero,TableroNuevo):-
-    TableroNuevo = Tablero.
+buscar_cruce_aux(6,_NumFila,_Fila,Tablero,Tablero).
 
 
+buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
+  Cont is 1,
+  buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo).
+
+buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  colapsar_lista(NumFila,Columna,ColNueva),
+  setColumna(Cont,ColNueva,Tablero,TN),
+  C is Cont + 1,
+  buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
+buscar_en_columnasAux(6,_NumFila,Tablero,Tablero).
 
 cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   (Cont = 1;Cont = 2; Cont = 3),
@@ -228,59 +242,6 @@ cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   E3 = E4,
   E4 = E5,
   colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
-
-
-
-buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
-  Cont is 1,
-  buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo).
-
-buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
-  Cont < 6,
-  obtenerColumna(Cont,Tablero,Columna),
-  colapsar_lista(NumFila,Columna,ColNueva),
-  setColumna(Cont,ColNueva,Tablero,TN),
-  C is Cont + 1,
-  buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
-buscar_en_columnasAux(6,_NumFila,Tablero,TableroNuevo):-
-    TableroNuevo = Tablero.
-
-
-
-buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
-  obtenerColumna(NumCol,Tablero,Columna),
-  hay_colapso(Columna),
-  buscar_en_filas_cruce(NumCol,Columna,Tablero,TableroNuevo).
-buscar_colapsos_vert(NumCol,Tablero,TableroNuevo):-
-  buscar_en_filas(NumCol,Tablero,TableroNuevo).
-
-buscar_en_filas(NumCol,Tablero,TableroNuevo):-
-  Cont is 1,
-  buscar_en_filasAux(Cont,NumCol,Tablero,TableroNuevo).
-
-buscar_en_filasAux(Cont,NumCol,Tablero,TableroNuevo):-
-  Cont < 6,
-  obtenerFila(Cont,Tablero,Fila),
-  colapsar_lista(NumCol,Fila,FilaNueva),
-  setFila(Cont,FilaNueva,Tablero,TN),
-  C is Cont + 1,
-  buscar_en_filasAux(C,NumCol,TN,TableroNuevo).
-
-
-buscar_en_filas_cruce(NumCol,Columna,Tablero,TableroNuevo):-
-  Cont is 1,
-  buscar_en_filas_cruce_aux(Cont,NumCol,Columna,Tablero,TableroNuevo).
-
-buscar_en_filas_cruce_aux(Cont,NumCol,Columna,Tablero,TableroNuevo):-
-  Cont < 6,
-  obtenerFila(Cont,Tablero,Fila),
-  obtenerElem(Fila,NumCol,Elem),
-  cruzar(Cont,Elem,Columna,ColNueva),
-  colapsar_lista(NumCol,Fila,FilaNueva),
-  setColumna(NumCol,ColNueva,Tablero,TNuevo),
-  setFila(Cont,FilaNueva,TNuevo,TNuevo1),
-  C is Cont + 1,
-  buscar_en_filas_cruce_aux(C,NumCol,ColNueva,TNuevo1,TableroNuevo).
 
 
 colapsar_lista(Num,L,LN):-
