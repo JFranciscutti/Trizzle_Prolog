@@ -14,11 +14,16 @@ upgrade(r2,r3).
 upgrade(r3,r3).
 
 
-obtenerFila(1,[L1,_L2,_L3,_L4,_L5],L1).
-obtenerFila(2,[_L1,L2,_L3,_L4,_L5],L2).
-obtenerFila(3,[_L1,_L2,L3,_L4,_L5],L3).
-obtenerFila(4,[_L1,_L2,_L3,L4,_L5],L4).
-obtenerFila(5,[_L1,_L2,_L3,_L4,L5],L5).
+obtenerColumna(Num ,Tablero,  Columna):-
+   transpose(Tablero, TableroTransp),
+   obtenerFila(Num, TableroTransp, Columna).
+
+obtenerFila(1,[ X | _Tail],  X).
+obtenerFila(Num ,[_X | Tail],Fila):-
+  Num1 is Num-1,
+  obtenerFila(Num1, Tail,  Fila).
+
+
 
 
 setFila(1,L,[_L1,L2,L3,L4,L5],[L,L2,L3,L4,L5]).
@@ -27,13 +32,7 @@ setFila(3,L,[L1,L2,_L3,L4,L5],[L1,L2,L,L4,L5]).
 setFila(4,L,[L1,L2,L3,_L4,L5],[L1,L2,L3,L,L5]).
 setFila(5,L,[L1,L2,L3,L4,_L5],[L1,L2,L3,L4,L]).
 
-obtenerColumna(Num,[L1,L2,L3,L4,L5],ListaN):-
-  obtenerElem(Num,L1,E1),
-  obtenerElem(Num,L2,E2),
-  obtenerElem(Num,L3,E3),
-  obtenerElem(Num,L4,E4),
-  obtenerElem(Num,L5,E5),
-  ListaN=[E1,E2,E3,E4,E5].
+
 
 /*
   Num=posicion en la que quiero la columna,
@@ -138,58 +137,65 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
 
 buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
-  hay_colapso(Fila),
-  buscar_cruce(NumFila,Fila,Tablero,TNuevo),
+  hay_colapso(Fila,ElemColapso),
+  buscar_cruce(NumFila,Fila,ElemColapso,Tablero,TNuevo),
   obtenerFila(NumFila,TNuevo,FilaNueva),
   colapsar_lista(3,FilaNueva,FilaN),
   setFila(NumFila,FilaN,TNuevo,TableroNuevo),!.
 
 buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
-  not(hay_colapso(Fila)),
+  not(hay_colapso(Fila,_ElemColapso)),
   buscar_en_columnas(NumFila,Tablero,TableroNuevo),!.
 
 
-hay_colapso(Fila):-
-  iguales_cuatro(3,Fila,_FilaNueva);
-  iguales_tres(3,Fila,_FilaNueva),!.
+hay_colapso(Fila,ElemColapso):-
+  iguales_cuatro(3,Fila,_FilaNueva,ElemColapso);
+  iguales_tres(3,Fila,_FilaNueva,ElemColapso),!.
 
-buscar_cruce(NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce(NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont is 1,
-  buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo).
+  buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
-buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
-  hay_colapso(Columna),
-  obtenerElem(NumFila,Columna,Elem),
+  hay_colapso(Columna,ElemColapso),
+  ColapsoFila = ElemColapso,
   cruzar(Cont,Elem,Fila,FilaNueva),
   colapsar_lista(NumFila,Columna,ColNueva),
   setFila(NumFila,FilaNueva,Tablero,TNuevo),
   setColumna(Cont,ColNueva,TNuevo,TNuevo1),
   C is Cont + 1,
-  buscar_cruce_aux(C,NumFila,FilaNueva,TNuevo1,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,TNuevo1,TableroNuevo).
 
-buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
+    Cont < 6,
+    obtenerColumna(Cont,Tablero,Columna),
+    hay_colapso(Columna,ElemColapso),
+    ElemColapso \= ColapsoFila,
+    C is Cont + 1,
+    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
+
+
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
-  not(hay_colapso(Columna)),
+  not(hay_colapso(Columna,_ElemColapso)),
   C is Cont + 1,
-  buscar_cruce_aux(C,NumFila,Fila,Tablero,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
-buscar_cruce_aux(Cont,NumFila,Fila,Tablero,TableroNuevo):-
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
-  hay_colapso(Columna),
+  hay_colapso(Columna,_ElemColapso),
   obtenerElem(NumFila,Columna,Elem),
   not(cruzar(Cont,Elem,Fila,FilaNueva)),
-  colapsar_lista(NumFila,Columna,ColNueva),
-  setColumna(Cont,ColNueva,Tablero,TNuevo),
   C is Cont + 1,
-  buscar_cruce_aux(C,NumFila,FilaNueva,TNuevo,TableroNuevo).
+  buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,Tablero,TableroNuevo).
 
 
-buscar_cruce_aux(6,_NumFila,_Fila,Tablero,Tablero).
+buscar_cruce_aux(6,_NumFila,_Fila,_ColapsoFila,Tablero,Tablero).
 
 
 buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
@@ -245,11 +251,11 @@ cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
 
 
 colapsar_lista(Num,L,LN):-
-  iguales_cuatro(Num,L,LN),
+  iguales_cuatro(Num,L,LN,_ElemColapso),
   !.
 
 colapsar_lista(Num,L,LN):-
-  iguales_tres(Num,L,LN),
+  iguales_tres(Num,L,LN,_ElemColapso),
   !.
 colapsar_lista(_Num,L,L).
 
@@ -267,39 +273,44 @@ checkPos(Num,Ext1,Ext2,Num):-
 
 
 
-iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3),
   LN = [x,x,x,E4,E5],
   checkPos(Num,1,3,PosFinal),
   upgrade(E1,NElem),
+  ElemColapso = E1,
   setElem(NElem,LN,PosFinal,ListaN).
 
-iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E2=E3,E3=E4),
   LN=[E1,x,x,x,E5],
   checkPos(Num,2,4,PosFinal),
   upgrade(E2,NElem),
+  ElemColapso = E2,
   setElem(NElem,LN,PosFinal,ListaN).
 
-iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
+iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E3=E4,E4=E5),
   LN=[E1,E2,x,x,x],
   checkPos(Num,3,5,PosFinal),
   upgrade(E3,NElem),
+  ElemColapso = E3,
   setElem(NElem,LN,PosFinal,ListaN).
 
-iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
+iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3,E3=E4),
   LN=[x,x,x,x,E5],
   checkPos(Num,1,4,PosFinal),
   upgrade(E4,NElem),
+  ElemColapso = E4,
   setElem(NElem,LN,PosFinal,ListaN).
 
-iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
+iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E2=E3,E3=E4,E4=E5),
   LN=[E1,x,x,x,x],
   checkPos(Num,2,5,PosFinal),
   upgrade(E5,NElem),
+  ElemColapso = E5,
   setElem(NElem,LN,PosFinal,ListaN).
 
 gravedad_columnas(Tablero,TableroN):-
