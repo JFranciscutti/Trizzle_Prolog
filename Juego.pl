@@ -157,18 +157,41 @@ buscar_cruce(NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont is 1,
   buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
+/*
+ * CASO 1: COLAPSO EN COLUMNA. CRUCE EFECTIVO
+ * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
   hay_colapso(Columna,ElemColapso),
   ColapsoFila = ElemColapso,
-  cruzar(Cont,Elem,Fila,FilaNueva),
+  cruzar(Cont,ColapsoFila,Fila,FilaNueva),
   colapsar_lista(NumFila,Columna,ColNueva),
   setFila(NumFila,FilaNueva,Tablero,TNuevo),
   setColumna(Cont,ColNueva,TNuevo,TNuevo1),
   C is Cont + 1,
   buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,TNuevo1,TableroNuevo).
 
+/*
+ * CASO 2: COLAPSO EN COLUMNA CON ELEMENTO EN COMUN CON LA FILA (NO CRUCE)
+ * */
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
+    Cont < 6,
+    obtenerColumna(Cont,Tablero,Columna),
+    hay_colapso(Columna,ElemColapso),
+    ElemColapso \= ColapsoFila,
+    obtenerElem(Cont,Fila,ElemFila),
+    obtenerElem(Cont,Columna,ElemCol),
+    ElemFila = ElemCol,
+    colapsar_lista(NumFila,Columna,ColNueva),
+    setColumna(Cont,ColNueva,Tablero,TNuevo),
+    C is Cont + 1,
+    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,TNuevo,TableroNuevo).
+
+/*
+ * CASO 3: COLAPSO EN COLUMNA PERO NO ES EL MISMO ELEMENTO QUE
+ * HACE QUE COLAPSE LA FILA
+ * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     Cont < 6,
     obtenerColumna(Cont,Tablero,Columna),
@@ -177,7 +200,9 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     C is Cont + 1,
     buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
-
+/*
+ * CASO 4: NO HAY COLAPSO EN LA COLUMNA, SALTEO
+ * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
@@ -185,12 +210,14 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   C is Cont + 1,
   buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
+/*
+ * CASO 5: COLAPSO EN COLUMNA PERO NADA QUE VER CON MI MOVIMIENTO
+ * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
   hay_colapso(Columna,_ElemColapso),
-  obtenerElem(NumFila,Columna,Elem),
-  not(cruzar(Cont,Elem,Fila,FilaNueva)),
+  not(cruzar(Cont,ColapsoFila,Fila,FilaNueva)),
   C is Cont + 1,
   buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,Tablero,TableroNuevo).
 
@@ -243,7 +270,7 @@ cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
 
 cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
-  (Cont = 3; Cont = 4, Cont = 5),
+  (Cont = 3; Cont = 4; Cont = 5),
   Elem = E3,
   E3 = E4,
   E4 = E5,
@@ -259,7 +286,8 @@ colapsar_lista(Num,L,LN):-
   !.
 colapsar_lista(_Num,L,L).
 
-checkPos(Num,Ext1,_Ext2,PosFinal):-
+%checkPos(Num,_E,_E2,Num).
+/*checkPos(Num,Ext1,_Ext2,PosFinal):-
     Num < Ext1,
     PosFinal is Num + 1.
 checkPos(Num,_Ext1,Ext2,PosFinal):-
@@ -269,49 +297,44 @@ checkPos(Num,Ext1,Ext2,Num):-
     Num = Ext1;
     Num = Ext2;
     Num < Ext2;
-    Num > Ext1.
+    Num > Ext1.*/
 
 
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3),
   LN = [x,x,x,E4,E5],
-  checkPos(Num,1,3,PosFinal),
   upgrade(E1,NElem),
   ElemColapso = E1,
-  setElem(NElem,LN,PosFinal,ListaN).
+  setElem(NElem,LN,Num,ListaN).
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E2=E3,E3=E4),
   LN=[E1,x,x,x,E5],
-  checkPos(Num,2,4,PosFinal),
   upgrade(E2,NElem),
   ElemColapso = E2,
-  setElem(NElem,LN,PosFinal,ListaN).
+  setElem(NElem,LN,Num,ListaN).
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E3=E4,E4=E5),
   LN=[E1,E2,x,x,x],
-  checkPos(Num,3,5,PosFinal),
   upgrade(E3,NElem),
   ElemColapso = E3,
-  setElem(NElem,LN,PosFinal,ListaN).
+  setElem(NElem,LN,Num,ListaN).
 
 iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3,E3=E4),
   LN=[x,x,x,x,E5],
-  checkPos(Num,1,4,PosFinal),
   upgrade(E4,NElem),
   ElemColapso = E4,
-  setElem(NElem,LN,PosFinal,ListaN).
+  setElem(NElem,LN,Num,ListaN).
 
 iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E2=E3,E3=E4,E4=E5),
   LN=[E1,x,x,x,x],
-  checkPos(Num,2,5,PosFinal),
   upgrade(E5,NElem),
   ElemColapso = E5,
-  setElem(NElem,LN,PosFinal,ListaN).
+  setElem(NElem,LN,Num,ListaN).
 
 gravedad_columnas(Tablero,TableroN):-
   Cont = 1,
