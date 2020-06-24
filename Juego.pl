@@ -205,6 +205,23 @@ buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
 buscar_en_columnasAux(6,_NumFila,Tablero,Tablero).
 
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
+  Elem = E1,
+  E1 = E2,
+  E2 = E3,
+  E3 = E4,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
+cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
+  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
+  Elem = E2,
+  E2 = E3,
+  E3 = E4,
+  E4 = E5,
+  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
+
 cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   (Cont = 1;Cont = 2; Cont = 3),
   Elem = E1,
@@ -227,23 +244,6 @@ cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
 
 
-cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
-  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
-  Elem = E1,
-  E1 = E2,
-  E2 = E3,
-  E3 = E4,
-  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
-
-cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
-  (Cont = 1;Cont = 2; Cont = 3; Cont = 4),
-  Elem = E2,
-  E2 = E3,
-  E3 = E4,
-  E4 = E5,
-  colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
-
-
 colapsar_lista(Num,L,LN):-
   iguales_cuatro(Num,L,LN),
   !.
@@ -253,36 +253,54 @@ colapsar_lista(Num,L,LN):-
   !.
 colapsar_lista(_Num,L,L).
 
+checkPos(Num,Ext1,_Ext2,PosFinal):-
+    Num < Ext1,
+    PosFinal is Num + 1.
+checkPos(Num,_Ext1,Ext2,PosFinal):-
+    Num > Ext2,
+    PosFinal is Num - 1.
+checkPos(Num,Ext1,Ext2,Num):-
+    Num = Ext1;
+    Num = Ext2;
+    Num < Ext2;
+    Num > Ext1.
+
+
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
   (E1=E2,E2=E3),
   LN = [x,x,x,E4,E5],
+  checkPos(Num,1,3,PosFinal),
   upgrade(E1,NElem),
-  setElem(NElem,LN,Num,ListaN).
+  setElem(NElem,LN,PosFinal,ListaN).
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
   (E2=E3,E3=E4),
   LN=[E1,x,x,x,E5],
+  checkPos(Num,2,4,PosFinal),
   upgrade(E2,NElem),
-  setElem(NElem,LN,Num,ListaN).
+  setElem(NElem,LN,PosFinal,ListaN).
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN):-
   (E3=E4,E4=E5),
   LN=[E1,E2,x,x,x],
+  checkPos(Num,3,5,PosFinal),
   upgrade(E3,NElem),
-  setElem(NElem,LN,Num,ListaN).
+  setElem(NElem,LN,PosFinal,ListaN).
 
 iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
   (E1=E2,E2=E3,E3=E4),
   LN=[x,x,x,x,E5],
+  checkPos(Num,1,4,PosFinal),
   upgrade(E4,NElem),
-  setElem(NElem,LN,Num,ListaN).
+  setElem(NElem,LN,PosFinal,ListaN).
 
 iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN):-
   (E2=E3,E3=E4,E4=E5),
   LN=[E1,x,x,x,x],
+  checkPos(Num,2,5,PosFinal),
   upgrade(E5,NElem),
-  setElem(NElem,LN,Num,ListaN).
+  setElem(NElem,LN,PosFinal,ListaN).
 
 gravedad_columnas(Tablero,TableroN):-
   Cont = 1,
