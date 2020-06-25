@@ -101,8 +101,8 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,TableroNuevo),
-  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
+  setFila(Num,ListaN,Tablero,EvolTablero).
+  %generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
@@ -236,10 +236,31 @@ buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
 buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
+  hay_colapso(Columna,ElemColapso),
+  obtenerElem(NumFila,Columna,ElemFila),
+  ElemFila = ElemColapso,
   colapsar_lista(NumFila,Columna,ColNueva),
   setColumna(Cont,ColNueva,Tablero,TN),
   C is Cont + 1,
   buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
+
+buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  hay_colapso(Columna,ElemColapso),
+  obtenerElem(NumFila,Columna,ElemFila),
+  ElemFila \= ElemColapso,
+  C is Cont + 1,
+  buscar_en_columnasAux(C,NumFila,Tablero,TableroNuevo).
+
+
+buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  not(hay_colapso(Columna,_ElemColapso)),
+  C is Cont + 1,
+  buscar_en_columnasAux(C,NumFila,Tablero,TableroNuevo).
+
 buscar_en_columnasAux(6,_NumFila,Tablero,Tablero).
 
 
@@ -289,21 +310,6 @@ colapsar_lista(Num,L,LN):-
   iguales_tres(Num,L,LN,_ElemColapso),
   !.
 colapsar_lista(_Num,L,L).
-
-%checkPos(Num,_E,_E2,Num).
-/*checkPos(Num,Ext1,_Ext2,PosFinal):-
-    Num < Ext1,
-    PosFinal is Num + 1.
-checkPos(Num,_Ext1,Ext2,PosFinal):-
-    Num > Ext2,
-    PosFinal is Num - 1.
-checkPos(Num,Ext1,Ext2,Num):-
-    Num = Ext1;
-    Num = Ext2;
-    Num < Ext2;
-    Num > Ext1.*/
-
-
 
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3),
