@@ -165,15 +165,30 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   obtenerColumna(Cont,Tablero,Columna),
   hay_colapso(Columna,ElemColapso),
   ColapsoFila = ElemColapso,
-  cruzar(Cont,ColapsoFila,Fila,FilaNueva),
+  cruzar(Cont,_ElemColapso,Fila,FilaNueva),
   colapsar_lista(NumFila,Columna,ColNueva),
   setFila(NumFila,FilaNueva,Tablero,TNuevo),
   setColumna(Cont,ColNueva,TNuevo,TNuevo1),
   C is Cont + 1,
   buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,TNuevo1,TableroNuevo).
+/*
+ * CASO 2: HAY COLAPSO EN LA COLUMNA, ES EL MISMO ELEMENTO QUE COLAPSA EN
+ * LA FILA PERO NO ES EL MISMO ELEMENTO QUE ESTA EN LA INTERSECCION
+ * DE LA FILA Y LA COLUMNA
+ * */
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
+    Cont < 6,
+    obtenerColumna(Cont,Tablero,Columna),
+    hay_colapso(Columna,ElemColapso),
+    ElemColapso = ColapsoFila,
+    obtenerElem(NumFila,Columna,ElemFila),
+    ElemColapso \= ElemFila,
+    C is Cont + 1,
+    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
- * CASO 2: COLAPSO EN COLUMNA CON ELEMENTO EN COMUN CON LA FILA (NO CRUCE)
+ * CASO 3: HAY COLAPSO EN LA COLUMNA Y SALE DESDE LA FILA QUE FUE
+ * DESPLAZADA
  * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     Cont < 6,
@@ -189,7 +204,7 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,TNuevo,TableroNuevo).
 
 /*
- * CASO 3: COLAPSO EN COLUMNA PERO NO ES EL MISMO ELEMENTO QUE
+ * CASO 4: COLAPSO EN COLUMNA PERO NO ES EL MISMO ELEMENTO QUE
  * HACE QUE COLAPSE LA FILA
  * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
@@ -200,15 +215,6 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     C is Cont + 1,
     buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
-/*
- * CASO 4: NO HAY COLAPSO EN LA COLUMNA, SALTEO
- * */
-buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
-  Cont < 6,
-  obtenerColumna(Cont,Tablero,Columna),
-  not(hay_colapso(Columna,_ElemColapso)),
-  C is Cont + 1,
-  buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
  * CASO 5: COLAPSO EN COLUMNA PERO NADA QUE VER CON MI MOVIMIENTO
@@ -220,6 +226,16 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   not(cruzar(Cont,ColapsoFila,Fila,FilaNueva)),
   C is Cont + 1,
   buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,Tablero,TableroNuevo).
+
+/*
+ * CASO 6: NO HAY COLAPSO EN LA COLUMNA, SALTEO
+ * */
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  not(hay_colapso(Columna,_ElemColapso)),
+  C is Cont + 1,
+  buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 
 buscar_cruce_aux(6,_NumFila,_Fila,_ColapsoFila,Tablero,Tablero).
