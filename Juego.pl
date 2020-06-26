@@ -1,6 +1,11 @@
 :- use_rendering(table).
 :- use_module(library(clpfd)).
 
+
+/*
+ * Los predicados upgrade/2 reciben una mamushka de cualquier color
+ * y devuelven su tamaño siguiente. Si es tamaño 3, solo queda en 3.
+ * */
 upgrade(v1,v2).
 upgrade(v2,v3).
 upgrade(v3,v3).
@@ -13,11 +18,15 @@ upgrade(r1,r2).
 upgrade(r2,r3).
 upgrade(r3,r3).
 
-
+/*
+ * Retorna la columna ubicada en la posicion Num en el Tablero.
+ * */
 obtenerColumna(Num ,Tablero,  Columna):-
    transpose(Tablero, TableroTransp),
    obtenerFila(Num, TableroTransp, Columna).
-
+/*
+ * Retorna la fila ubicada en la posicion Num en el Tablero.
+ * */
 obtenerFila(1,[ X | _Tail],  X).
 obtenerFila(Num ,[_X | Tail],Fila):-
   Num1 is Num-1,
@@ -25,7 +34,10 @@ obtenerFila(Num ,[_X | Tail],Fila):-
 
 
 
-
+/*
+ * Ubica una lista dada en la posicion que se le indique en el
+ * tablero y retorna el tablero nuevo.
+ * */
 setFila(1,L,[_L1,L2,L3,L4,L5],[L,L2,L3,L4,L5]).
 setFila(2,L,[L1,_L2,L3,L4,L5],[L1,L,L3,L4,L5]).
 setFila(3,L,[L1,L2,_L3,L4,L5],[L1,L2,L,L4,L5]).
@@ -35,11 +47,9 @@ setFila(5,L,[L1,L2,L3,L4,_L5],[L1,L2,L3,L4,L]).
 
 
 /*
-  Num=posicion en la que quiero la columna,
-  [E1..E5]= columnna a insertar,
-  [L1..L5]= tablero en el que quiero insertar la columnna,
-  [NL1..NL5]= tablero con columna nueva.
-*/
+ * Ubica una columna en la posicion Num del tablero y retorna
+ * el tablero resultante.
+ * */
 setColumna(Num,[E1,E2,E3,E4,E5],[L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   setElem(E1,L1,Num,NL1),
   setElem(E2,L2,Num,NL2),
@@ -47,20 +57,29 @@ setColumna(Num,[E1,E2,E3,E4,E5],[L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   setElem(E4,L4,Num,NL4),
   setElem(E5,L5,Num,NL5).
 
-
+/*
+ * Dada una lista, retorna el elemento que se encuentra en la
+ * posicion indicada.
+ * */
 obtenerElem(1,[E1,_E2,_E3,_E4,_E5],E1).
 obtenerElem(2,[_E1,E2,_E3,_E4,_E5],E2).
 obtenerElem(3,[_E1,_E2,E3,_E4,_E5],E3).
 obtenerElem(4,[_E1,_E2,_E3,E4,_E5],E4).
 obtenerElem(5,[_E1,_E2,_E3,_E4,E5],E5).
 
+/*
+ * Dado Elem y una lista, Elem es añadido en la
+ * posicion indicada. Retorna la lista resultante.
+ * */
 setElem(Elem,[_E1,E2,E3,E4,E5],1,[Elem,E2,E3,E4,E5]).
 setElem(Elem,[E1,_E2,E3,E4,E5],2,[E1,Elem,E3,E4,E5]).
 setElem(Elem,[E1,E2,_E3,E4,E5],3,[E1,E2,Elem,E4,E5]).
 setElem(Elem,[E1,E2,E3,_E4,E5],4,[E1,E2,E3,Elem,E5]).
 setElem(Elem,[E1,E2,E3,E4,_E5],5,[E1,E2,E3,E4,Elem]).
 
-
+/*
+ * Genera el tablero inicial
+ * */
 generarTablero(Tablero):-
   generarFila(F1),
   generarFila(F2),
@@ -69,6 +88,10 @@ generarTablero(Tablero):-
   generarFila(F5),
   Tablero = [F1,F2,F3,F4,F5].
 
+/*
+ * Genera listas con mamushkas random (todas de tamaño 1)
+ * que representan las filas del tablero principal.
+ * */
 generarFila(L):-
   random(1,4,E1), %genera un random entre 1 y 4 (4 excluido)
   mamushka(E1,C1), %dado el random, genera la mamushka v1, r1 o a1
@@ -87,6 +110,10 @@ generarFila(L):-
   addLast(C5,L4,L5),
   L = L5.
 
+/*
+ * Dado un numero 1,2 o 3, genera una mamushka de color azul,
+ * rojo o verde respectivamente.
+ * */
 mamushka(E,Elem):-
   E is 1,
   Elem = a1.
@@ -97,12 +124,20 @@ mamushka(E,Elem):-
   E is 3,
   Elem = v1.
 
+%**********************************************************************
+%//////////////GENERO EL TABLERO 1: TABLERO DESPLAZADO\\\\\\\\\\\\\\\\\
+%**********************************************************************
+
+/*
+ * Desplaza la fila (o columna) de la posicion Num del Tablero
+ * Cant veces hacia la direccion Dir. Retorna una lista con 4 tableros.
+ * */
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'der' ; Dir = 'izq'),
   obtenerFila(Num,Tablero,Lista),
   rotar(Dir,Cant,Lista,ListaN),
-  setFila(Num,ListaN,Tablero,EvolTablero).
-  %generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
+  setFila(Num,ListaN,Tablero,TableroNuevo),
+  generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
 desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   (Dir = 'abj' ; Dir = 'arb'),
@@ -111,7 +146,32 @@ desplazar(Dir, Num, Cant, Tablero, EvolTablero):-
   setColumna(Num,ListaN,Tablero,TableroNuevo),
   generarEvolTablero(Dir,Num,TableroNuevo,EvolTablero).
 
+/*
+ * Dada una lista (que puede ser una fila o una columna),
+ * la rota Cant veces hacia el Sentido que se le indique.
+ * */
+rotar(_Sentido,0,Lista,Lista):-!.
 
+rotar(Sentido,Cant,Lista,ListaN):-
+  (Sentido = 'der'; Sentido= 'abj'),
+  shift_derecha(Lista,LN),
+  C is Cant - 1,
+  rotar(Sentido,C,LN,ListaN).
+
+rotar(Sentido,Cant,Lista,ListaN):-
+  (Sentido = 'izq'; Sentido='arb'),
+  shift_izquierda(Lista,LN),
+  C is Cant - 1,
+  rotar(Sentido,C,LN,ListaN).
+
+/*
+ * Dir indica si movimos una columna o una fila.
+ * Dado el Tablero ya desplazado, genera tableros despues
+ * de ser colapsados, con las x ubicadas hacia abajo por gravedad
+ * y con las x reemplazadas por randoms.
+ * Si no hubo colapsos, devuelve una lista con el primer tablero.
+ * Si hubo colapsos, devuelve una lista con los 4 tableros descriptos arriba
+ * */
 generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   (Dir = 'abj' ; Dir = 'arb'),
   addLast(Tablero,[],L1),
@@ -122,7 +182,8 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   gravedad_columnas(TColapsosN,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
   random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
-  addLast(TRandom,L3,ListaTableros).
+  addLast(TRandom,L3,ListaT),
+  corregir_lista(ListaT,ListaTableros).%si no hubo colapsos, devuelve la lista solo con el tablero desplazado
 
 generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   (Dir = 'der' ; Dir = 'izq'),
@@ -132,9 +193,28 @@ generarEvolTablero(Dir,Num,Tablero,ListaTableros):-
   gravedad_columnas(TColapsos,TGravedad),%tira para abajo todas las mamushkas por gravedad
   addLast(TGravedad,L2,L3),
   random_tablero(TGravedad,TRandom),%reemplaza las x por mamushkas randoms
-  addLast(TRandom,L3,ListaTableros).
+  addLast(TRandom,L3,ListaT),
+  corregir_lista(ListaT,ListaTableros).%si no hubo colapsos, devuelve la lista solo con el tablero desplazado
+
+/*
+ * Si el primer elemento es igual al segundo, implica que todos los elementos
+ * son iguales, luego, devuelvo una lista solamente con el primer elemento
+ * */
+corregir_lista([H1,H2,_T],ListaN):-
+    H1 = H2,
+    ListaN = [H1].
+corregir_lista(Lista,Lista).
+
+%**********************************************************************
+%////////////////GENERO EL TABLERO 2: TABLERO COLAPSADO\\\\\\\\\\\\\\\\
+%**********************************************************************
 
 
+
+/*
+ * Busco colapsos que generen un cruce con la fila (o columna) que movi.
+ * (Si hubo un colapso en la fila/columna que movi, posiblemente haya un cruce)
+ * */
 buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   hay_colapso(Fila,ElemColapso),
@@ -143,16 +223,26 @@ buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   colapsar_lista(3,FilaNueva,FilaN),
   setFila(NumFila,FilaN,TNuevo,TableroNuevo),!.
 
+/*
+ * Busco solo colapsos en las columnas/filas.
+ * (Si no hay colapso en la fila/columna que movi, imposible que haya un cruce)
+ * */
 buscar_colapsos(NumFila,Tablero,TableroNuevo):-
   obtenerFila(NumFila,Tablero,Fila),
   not(hay_colapso(Fila,_ElemColapso)),
   buscar_en_columnas(NumFila,Tablero,TableroNuevo),!.
 
-
+/*
+ * Dada una fila o columna, retorna true si hubo un colapso en esta.
+ * */
 hay_colapso(Fila,ElemColapso):-
   iguales_cuatro(3,Fila,_FilaNueva,ElemColapso);
   iguales_tres(3,Fila,_FilaNueva,ElemColapso),!.
 
+/*
+ * Predicado cascara que recorre todas las filas/columnas
+ * colapsando cruces si existen.
+ * */
 buscar_cruce(NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont is 1,
   buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
@@ -187,7 +277,19 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
- * CASO 3: HAY COLAPSO EN LA COLUMNA Y SALE DESDE LA FILA QUE FUE
+ * CASO 3: COLAPSO EN COLUMNA PERO NO ES EL MISMO ELEMENTO QUE
+ * HACE QUE COLAPSE LA FILA
+ * */
+buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
+    Cont < 6,
+    obtenerColumna(Cont,Tablero,Columna),
+    hay_colapso(Columna,ElemColapso),
+    ElemColapso \= ColapsoFila,
+    C is Cont + 1,
+    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
+
+/*
+ * CASO 4: HAY COLAPSO EN LA COLUMNA Y SALE DESDE LA FILA QUE FUE
  * DESPLAZADA
  * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
@@ -203,17 +305,6 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
     C is Cont + 1,
     buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,TNuevo,TableroNuevo).
 
-/*
- * CASO 4: COLAPSO EN COLUMNA PERO NO ES EL MISMO ELEMENTO QUE
- * HACE QUE COLAPSE LA FILA
- * */
-buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
-    Cont < 6,
-    obtenerColumna(Cont,Tablero,Columna),
-    hay_colapso(Columna,ElemColapso),
-    ElemColapso \= ColapsoFila,
-    C is Cont + 1,
-    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
  * CASO 5: NO HAY COLAPSO EN LA COLUMNA, SALTEO
@@ -228,11 +319,32 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
 
 buscar_cruce_aux(6,_NumFila,_Fila,_ColapsoFila,Tablero,Tablero).
 
-
+/*
+ * Predicado cascara que recorre las columnas/filas buscando solo colapsos
+ * en filas/columnas. ACLARACION: todos los nombres de las variables son
+ * referidos a cuando muevo una fila. Si muevo una columna, tambien se usan
+ * estos predicados.
+ * */
 buscar_en_columnas(NumFila,Tablero,TableroNuevo):-
   Cont is 1,
   buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo).
 
+/*
+ * CASO 1: HAY COLAPSO EN LA COLUMNA PERO NO SE INTERSECTA CON LA FILA
+ * */
+buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  hay_colapso(Columna,ElemColapso),
+  obtenerElem(NumFila,Columna,ElemFila),
+  ElemFila \= ElemColapso,
+  C is Cont + 1,
+  buscar_en_columnasAux(C,NumFila,Tablero,TableroNuevo).
+
+/*
+ * CASO 2: HAY UN COLAPSO EN LA COLUMNA Y SE INTERSECTA CON
+ * LA FILA QUE YO DESPLACE
+ * */
 buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
@@ -244,16 +356,9 @@ buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   C is Cont + 1,
   buscar_en_columnasAux(C,NumFila,TN,TableroNuevo).
 
-buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
-  Cont < 6,
-  obtenerColumna(Cont,Tablero,Columna),
-  hay_colapso(Columna,ElemColapso),
-  obtenerElem(NumFila,Columna,ElemFila),
-  ElemFila \= ElemColapso,
-  C is Cont + 1,
-  buscar_en_columnasAux(C,NumFila,Tablero,TableroNuevo).
-
-
+/*
+ * CASO 3: NO HAY COLAPSO EN LA COLUMNA ENTONCES LA SALTEO
+ * */
 buscar_en_columnasAux(Cont,NumFila,Tablero,TableroNuevo):-
   Cont < 6,
   obtenerColumna(Cont,Tablero,Columna),
@@ -301,7 +406,10 @@ cruzar(Cont,Elem,[E1,E2,E3,E4,E5],FilaNueva):-
   E4 = E5,
   colapsar_lista(Cont,[E1,E2,E3,E4,E5],FilaNueva).
 
-
+/*
+ * Dada una lista, colapsa 4 o 3 mamushkas iguales hacia la
+ * fila/columna desplazada en la posicion Num del tablero.
+ * */
 colapsar_lista(Num,L,LN):-
   iguales_cuatro(Num,L,LN,_ElemColapso),
   !.
@@ -311,6 +419,10 @@ colapsar_lista(Num,L,LN):-
   !.
 colapsar_lista(_Num,L,L).
 
+/*
+ * Busca colapsos de 3 mamushkas en las 3 posibles combinaciones:
+ * las primeras 3, las ultimas 3 o las 3 del medio.
+ * */
 iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3),
   LN = [x,x,x,E4,E5],
@@ -332,6 +444,10 @@ iguales_tres(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   ElemColapso = E3,
   setElem(NElem,LN,Num,ListaN).
 
+/*
+ * Busca colapsos de 4 mamushkas en las unicas 2 combinaciones posibles:
+ * las primeras 4 o las ultimas 4.
+ * */
 iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   (E1=E2,E2=E3,E3=E4),
   LN=[x,x,x,x,E5],
@@ -346,6 +462,14 @@ iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
   ElemColapso = E5,
   setElem(NElem,LN,Num,ListaN).
 
+%**********************************************************************
+%/////////////GENERO EL TABLERO 3: TABLERO CON GRAVEDAD\\\\\\\\\\\\\\\\
+%**********************************************************************
+
+/*
+ * Dado un tablero, busca x en todas las columnas y las tira hacia abajo,
+ * emulando una gravedad en el tablero.
+ * */
 gravedad_columnas(Tablero,TableroN):-
   Cont = 1,
   gravedad_columnas_aux(Cont,Tablero,TableroN).
@@ -359,6 +483,10 @@ gravedad_columnas_aux(Cont,Tablero,TableroN):-
 gravedad_columnas_aux(6,Tablero,TableroN):-
     TableroN = Tablero.
 
+/*
+ * Dada una lista, la ordena posicionando las x a la izquierda y
+ * el resto de los elementos a la derecha en el orden original.
+ * */
 gravedad(Lista,ListaN):-
   obtenerElems(Lista,ListaE),
   size(ListaE,Cant),
@@ -379,7 +507,14 @@ rellenar(Cant,Lista,LN):-
   addFirst(x,Lista,ListaN),
   rellenar(C,ListaN,LN).
 
+%**********************************************************************
+%//////////////GENERO TABLERO 4: TABLERO CON RANDOMS\\\\\\\\\\\\\\\\\\\
+%**********************************************************************
 
+/*
+ * Recorre todas las filas y reemplaza todas las x por
+ * mamushkas randoms.
+ * */
 random_tablero([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   randomPorX(L1,NL1),
   randomPorX(L2,NL2),
@@ -387,7 +522,9 @@ random_tablero([L1,L2,L3,L4,L5],[NL1,NL2,NL3,NL4,NL5]):-
   randomPorX(L4,NL4),
   randomPorX(L5,NL5),!.
 
-
+/*
+ * Dada una lista con mamushkas y x, reemplaza las x por mamushkas randoms nuevas
+ * */
 randomPorX([],[]).
 randomPorX([H|T],[Elem|LN]):-
   H = x,
@@ -397,22 +534,6 @@ randomPorX([H|T],[Elem|LN]):-
 randomPorX([H|T],[H|LN]):-
   H \= x,
   randomPorX(T,LN).
-
-
-
-rotar(_Sentido,0,Lista,Lista):-!.
-
-rotar(Sentido,Cant,Lista,ListaN):-
-  (Sentido = 'der'; Sentido= 'abj'),
-  shift_derecha(Lista,LN),
-  C is Cant - 1,
-  rotar(Sentido,C,LN,ListaN).
-
-rotar(Sentido,Cant,Lista,ListaN):-
-  (Sentido = 'izq'; Sentido='arb'),
-  shift_izquierda(Lista,LN),
-  C is Cant - 1,
-  rotar(Sentido,C,LN,ListaN).
 
 
 /*PREDICADOS AUXILIARES REUTILIZADOS DE LOS PRACTICOS*/
