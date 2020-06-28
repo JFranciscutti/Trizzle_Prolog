@@ -261,23 +261,22 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
- * CASO 2: HAY COLAPSO EN LA COLUMNA, ES EL MISMO ELEMENTO QUE COLAPSA EN
- * LA FILA PERO NO ES EL MISMO ELEMENTO QUE ESTA EN LA INTERSECCION
- * DE LA FILA Y LA COLUMNA
+ * CASO 2: HAY COLAPSO EN LA COLUMNA PERO NO SALE DE LA FILA QUE DESPLACE
  * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
-    Cont < 6,
-    obtenerColumna(Cont,Tablero,Columna),
-    obtenerElem(Cont,Fila,ElemFila),
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  obtenerElem(Cont,Fila,ElemFila),
  	setElem(ElemFila,Columna,NumFila,ColOriginal),
-    hay_colapso(ColOriginal,ElemColapso),
-    obtenerElem(NumFila,ColOriginal,ElemFila),
-    not(check(NumFila,ElemColapso,ElemFila,ColOriginal)),
-    C is Cont + 1,
-    buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
+  hay_colapso(ColOriginal,ElemColapso),
+  obtenerElem(NumFila,ColOriginal,ElemFila),
+  not(check(NumFila,ElemColapso,ElemFila,ColOriginal)),
+  C is Cont + 1,
+  buscar_cruce_aux(C,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo).
 
 /*
- * CASO 3: COLAPSO EN COLUMNA. CRUCE EFECTIVO
+ * CASO 3: HAY COLAPSO EN LA COLUMNA Y SALE DEL COLAPSO DE LA FILA
+ * (CRUCE EFECTIVO)
  * */
 buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
   Cont < 6,
@@ -297,16 +296,16 @@ buscar_cruce_aux(Cont,NumFila,Fila,ColapsoFila,Tablero,TableroNuevo):-
  * DESPLAZADA
  * */
 buscar_cruce_aux(Cont,NumFila,_Fila,ColapsoFila,Tablero,TableroNuevo):-
-    Cont < 6,
-    obtenerColumna(Cont,Tablero,Columna),
-    hay_colapso(Columna,ElemColapso),
-    obtenerElem(NumFila,Columna,ElemFila),
-    check(NumFila,ElemColapso,ElemFila,Columna),
-    colapsar_lista(NumFila,Columna,ColNueva),
-    setColumna(Cont,ColNueva,Tablero,TNuevo),
-    obtenerFila(NumFila,TNuevo,FilaNueva),
-    C is Cont + 1,
-    buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,TNuevo,TableroNuevo).
+  Cont < 6,
+  obtenerColumna(Cont,Tablero,Columna),
+  hay_colapso(Columna,ElemColapso),
+  obtenerElem(NumFila,Columna,ElemFila),
+  check(NumFila,ElemColapso,ElemFila,Columna),
+  colapsar_lista(NumFila,Columna,ColNueva),
+  setColumna(Cont,ColNueva,Tablero,TNuevo),
+  obtenerFila(NumFila,TNuevo,FilaNueva),
+  C is Cont + 1,
+  buscar_cruce_aux(C,NumFila,FilaNueva,ColapsoFila,TNuevo,TableroNuevo).
 
 
 buscar_cruce_aux(6,_NumFila,_Fila,_ColapsoFila,Tablero,Tablero).
@@ -368,15 +367,15 @@ buscar_en_columnasAux(6,_NumFila,Tablero,Tablero).
  * */
 check(NumFila,ElemColapso,ElemFila,Columna):-
 	NumUp is NumFila - 1,
-    obtenerElem(NumUp,Columna,ElemUp),
-    ElemUp = ElemColapso,
-    ElemColapso = ElemFila.
+  obtenerElem(NumUp,Columna,ElemUp),
+  ElemUp = ElemColapso,
+  ElemColapso = ElemFila.
 
 check(NumFila,ElemColapso,ElemFila,Columna):-
 	NumDown is NumFila + 1,
-    obtenerElem(NumDown,Columna,ElemDown),
-    ElemDown = ElemColapso,
-    ElemColapso = ElemFila.
+  obtenerElem(NumDown,Columna,ElemDown),
+  ElemDown = ElemColapso,
+  ElemColapso = ElemFila.
 
 /*
  * Dada una lista, colapsa 4 o 3 mamushkas iguales hacia la
