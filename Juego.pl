@@ -438,7 +438,7 @@ iguales_cuatro(Num,[E1,E2,E3,E4,E5],ListaN,ElemColapso):-
 %**********************************************************************
 
 /*
- * Dado un tablero, busca x en todas las columnas y las tira hacia abajo,
+ * Dado un tablero, busca x en todas las columnas y las tira hacia arriba,
  * emulando una gravedad en el tablero.
  * */
 gravedad_columnas(Tablero,TableroN):-
